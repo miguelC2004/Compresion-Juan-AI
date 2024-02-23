@@ -9,7 +9,7 @@ Este proyecto implementa un algoritmo de compresión de imágenes utilizando una
 
 ## Requisitos
 
-- TensorFlow: Asegúrate de tener TensorFlow instalado en tu entorno de Python.
+- TensorFlow: Tener TensorFlow instalado en tu entorno de Python.
 
 ```bash
 pip install tensorflow
