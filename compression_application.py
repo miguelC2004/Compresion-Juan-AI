@@ -1,29 +1,28 @@
 import tensorflow as tf
-from compression_model import CompressionModel
 
-# No supe cómo hacer para cargar los datos de imágenes
-# Supongamos que tienes un conjunto de datos `train_images` y `test_images`
-
-# Normalización de las imágenes
-train_images = train_images / 255.0
-test_images = test_images / 255.0
-
-# Agregar una dimensión para el canal de color
-train_images = tf.expand_dims(train_images, axis=-1)
-test_images = tf.expand_dims(test_images, axis=-1)
-
-# Crear una instancia del modelo
-model = CompressionModel()
-
-# Compilar el modelo
-model.compile(optimizer='adam', loss='mse')
-
-# Entrenar el modelo
-model.fit(train_images, train_images, epochs=10, batch_size=128, shuffle=True, validation_data=(test_images, test_images))
-
-# Evaluar el modelo
-loss = model.evaluate(test_images, test_images)
-print("Loss:", loss)
-
-# Guardar el modelo entrenado
-model.save('compression_model.h5')
+class CompressionModel(tf.keras.Model):
+    def __init__(self, input_shape=(None, None, 1)):
+        super(CompressionModel, self).__init__()
+        self.input_layer = tf.keras.layers.Input(shape=input_shape)
+        self.encoder = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(16, (3, 3), activation='relu', padding='same'),
+            tf.keras.layers.MaxPooling2D((2, 2), padding='same'),
+            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
+            tf.keras.layers.MaxPooling2D((2, 2), padding='same'),
+            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
+            tf.keras.layers.MaxPooling2D((2, 2), padding='same')
+        ])
+        self.decoder = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
+            tf.keras.layers.UpSampling2D((2, 2)),
+            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
+            tf.keras.layers.UpSampling2D((2, 2)),
+            tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
+            tf.keras.layers.UpSampling2D((2, 2)),
+            tf.keras.layers.Conv2D(1, (3, 3), activation='sigmoid', padding='same')
+        ])
+    
+    def call(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
