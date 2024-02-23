@@ -1,7 +1,7 @@
 import tensorflow as tf
 from compression_model import CompressionModel
 
-# Cargar los datos de imágenes (ajustar según tus necesidades)
+# Cargar los datos de imágenes (ajustar según la necesidad)
 (train_images, _), (test_images, _) = tf.keras.datasets.mnist.load_data()
 
 # Normalización de las imágenes después de cargar los datos
@@ -13,7 +13,7 @@ train_images = tf.expand_dims(train_images, axis=-1)
 test_images = tf.expand_dims(test_images, axis=-1)
 
 # Crear una instancia del modelo
-model = CompressionModel(input_shape=(28, 28, 1))  # Ajustar dimensiones según tus imágenes
+model = CompressionModel(input_shape=(28, 28, 1))  # Ajustar dimensiones según las imágenes
 
 # Compilar el modelo con métricas adecuadas
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
