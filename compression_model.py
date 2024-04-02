@@ -1,28 +1,43 @@
 import tensorflow as tf
+from compression_model import build_compression_model
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import os
 
-class CompressionModel(tf.keras.Model):
-    def __init__(self, input_shape=(None, None, 1)):
-        super(CompressionModel, self).__init__()
-        self.input_layer = tf.keras.layers.Input(shape=input_shape)
-        self.encoder = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(16, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.MaxPooling2D((2, 2), padding='same'),
-            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.MaxPooling2D((2, 2), padding='same'),
-            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.MaxPooling2D((2, 2), padding='same')
-        ])
-        self.decoder = tf.keras.Sequential([
-            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.UpSampling2D((2, 2)),
-            tf.keras.layers.Conv2D(8, (3, 3), activation='relu', padding='same'),
-            tf.keras.layers.UpSampling2D((2, 2)),
-            tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
-            tf.keras.layers.UpSampling2D((2, 2)),
-            tf.keras.layers.Conv2D(1, (3, 3), activation='sigmoid', padding='same')
-        ])
-    
-    def call(self, x):
-        encoded = self.encoder(x)
-        decoded = self.decoder(encoded)
-        return decoded
+# Configuración
+batch_size = 32
+image_size = (256, 256)
+input_shape = image_size + (3,)
+epochs = 10
+data_dir = 'path/to/your/dataset'
+
+# Cargando y preparando el conjunto de datos
+train_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
+train_generator = train_datagen.flow_from_directory(
+    data_dir,
+    target_size=image_size,
+    batch_size=batch_size,
+    class_mode=None,  # Sin etiquetas, solo imágenes
+    subset='training'
+)
+validation_generator = train_datagen.flow_from_directory(
+    data_dir,
+    target_size=image_size,
+    batch_size=batch_size,
+    class_mode=None,
+    subset='validation'
+)
+
+# Construir modelo
+model = build_compression_model(input_shape)
+
+# Entrenamiento
+model.fit(
+    train_generator,
+    epochs=epochs,
+    validation_data=validation_generator
+)
+
+# Guardar modelo
+model.save('compression_model.h5')
+
+print("Modelo entrenado y guardado con éxito.")
