@@ -14,21 +14,3 @@ Este proyecto implementa un algoritmo de compresión de imágenes utilizando una
 ```bash
 pip install tensorflow
 ```
-
-The server will start listening on the specified port (default is 8000). You can then access the following routes:
-
-- `/`: Home page.
-- `/about`: About page.
-
-## Dependencies
-
-- `python-dotenv`: For loading environment variables from `.env` files.
-
-## Contributing
-
-Contributions are welcome! Feel free to open an issue or submit a pull request for any improvements or features you'd like to see.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
